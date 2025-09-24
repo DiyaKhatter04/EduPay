@@ -1,0 +1,536 @@
+<%- include('../layouts/main') %>
+
+<!-- Student Dashboard -->
+<div class="dashboard-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="user-welcome">
+                <h1>Welcome back, <%= student.studentInfo?.fullName || student.username %>!</h1>
+                <p class="user-subtitle">
+                    Student ID: <span class="highlight"><%= student.uniqueId %></span>
+                    <% if (student.studentInfo?.school) { %>
+                        | <%= student.studentInfo.school %>
+                    <% } %>
+                </p>
+            </div>
+            
+            <div class="quick-actions">
+                <button class="action-btn primary" onclick="openRequestModal()">
+                    <i class="fas fa-plus"></i>
+                    New Request
+                </button>
+                <button class="action-btn secondary" onclick="refreshDashboard()">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="stat-content">
+                <h3><%= stats.totalRequests %></h3>
+                <p>Total Requests</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon pending">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <h3><%= stats.pendingRequests %></h3>
+                <p>Pending</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon success">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <h3><%= stats.fulfilledRequests %></h3>
+                <p>Fulfilled</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon info">
+                <i class="fas fa-gift"></i>
+            </div>
+            <div class="stat-content">
+                <h3><%= availableDonations.length %></h3>
+                <p>Available Donations</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <!-- My Requests Section -->
+        <div class="content-section">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-list"></i>
+                    My Requests
+                </h2>
+                <div class="section-actions">
+                    <select class="filter-select" onchange="filterRequests(this.value)">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="fulfilled">Fulfilled</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="requests-container" id="requestsContainer">
+                <% if (requests.length === 0) { %>
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-clipboard"></i>
+                        </div>
+                        <h3>No requests yet</h3>
+                        <p>Create your first request to get started!</p>
+                        <button class="cta-button" onclick="openRequestModal()">
+                            <i class="fas fa-plus"></i>
+                            Create Request
+                        </button>
+                    </div>
+                <% } else { %>
+                    <% requests.forEach(request => { %>
+                        <div class="request-card" data-status="<%= request.status %>">
+                            <div class="request-header">
+                                <div class="request-type">
+                                    <i class="fas fa-<%= getTypeIcon(request.type) %>"></i>
+                                    <%= request.type.charAt(0).toUpperCase() + request.type.slice(1) %>
+                                </div>
+                                <div class="request-status <%= request.status %>">
+                                    <%= request.status.charAt(0).toUpperCase() + request.status.slice(1) %>
+                                </div>
+                            </div>
+                            
+                            <div class="request-content">
+                                <h4><%= request.description %></h4>
+                                <% if (request.amount > 0) { %>
+                                    <p class="request-amount">
+                                        <i class="fas fa-dollar-sign"></i>
+                                        $<%= request.amount.toFixed(2) %>
+                                    </p>
+                                <% } %>
+                                
+                                <div class="request-meta">
+                                    <span class="meta-item">
+                                        <i class="fas fa-calendar"></i>
+                                        Requested: <%= new Date(request.createdAt).toLocaleDateString() %>
+                                    </span>
+                                    
+                                    <% if (request.status === 'fulfilled' && request.fulfilledBy) { %>
+                                        <span class="meta-item">
+                                            <i class="fas fa-heart"></i>
+                                            Fulfilled by: Donor #<%= request.fulfilledBy.uniqueId %>
+                                        </span>
+                                    <% } %>
+                                    
+                                    <span class="meta-item urgency-<%= request.urgencyLevel %>">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <%= request.urgencyLevel.charAt(0).toUpperCase() + request.urgencyLevel.slice(1) %> Priority
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } %>
+            </div>
+        </div>
+        
+        <!-- Available Donations Section -->
+        <div class="content-section">
+            <div class="section-header">
+                <h2>
+                    <i class="fas fa-gift"></i>
+                    Available Donations
+                    <span class="live-indicator" id="liveIndicator">
+                        <i class="fas fa-circle"></i>
+                        Live
+                    </span>
+                </h2>
+                <div class="section-actions">
+                    <select class="filter-select" onchange="filterDonations(this.value)">
+                        <option value="all">All Types</option>
+                        <option value="laptop">Laptops</option>
+                        <option value="books">Books</option>
+                        <option value="fees">Fees</option>
+                        <option value="bag">Bags</option>
+                        <option value="shoes">Shoes</option>
+                        <option value="notes">Notes</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="donations-grid" id="donationsGrid">
+                <% if (availableDonations.length === 0) { %>
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3>No donations available</h3>
+                        <p>New donations will appear here in real-time!</p>
+                    </div>
+                <% } else { %>
+                    <% availableDonations.forEach(donation => { %>
+                        <div class="donation-card" data-type="<%= donation.type %>">
+                            <% if (donation.images && donation.images.length > 0) { %>
+                                <div class="donation-image">
+                                    <img src="<%= donation.images[0].path %>" alt="<%= donation.description %>" loading="lazy">
+                                    <% if (donation.images.length > 1) { %>
+                                        <div class="image-count">+<%= donation.images.length - 1 %></div>
+                                    <% } %>
+                                </div>
+                            <% } else { %>
+                                <div class="donation-image placeholder">
+                                    <i class="fas fa-<%= getTypeIcon(donation.type) %>"></i>
+                                </div>
+                            <% } %>
+                            
+                            <div class="donation-content">
+                                <div class="donation-header">
+                                    <div class="donation-type">
+                                        <%= donation.type.charAt(0).toUpperCase() + donation.type.slice(1) %>
+                                    </div>
+                                    <div class="donation-value">
+                                        $<%= donation.value.toFixed(2) %>
+                                    </div>
+                                </div>
+                                
+                                <h4><%= donation.description %></h4>
+                                
+                                <div class="donation-meta">
+                                    <span class="meta-item">
+                                        <i class="fas fa-user"></i>
+                                        Donor #<%= donation.donor.uniqueId %>
+                                    </span>
+                                    <span class="meta-item">
+                                        <i class="fas fa-clock"></i>
+                                        <%= getTimeAgo(donation.createdAt) %>
+                                    </span>
+                                </div>
+                                
+                                <button class="claim-btn" onclick="claimDonation('<%= donation._id %>')">
+                                    <i class="fas fa-hand-paper"></i>
+                                    Claim This Donation
+                                </button>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Request Modal -->
+<div class="modal" id="requestModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Create New Request</h3>
+            <button class="modal-close" onclick="closeRequestModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <form class="request-form" action="/student/request" method="POST" id="newRequestForm">
+            <div class="form-group">
+                <label for="type" class="form-label">Type of Request</label>
+                <select name="type" id="type" class="form-input" required>
+                    <option value="">Select type...</option>
+                    <option value="laptop">Laptop</option>
+                    <option value="books">Books</option>
+                    <option value="fees">Fees/Tuition</option>
+                    <option value="bag">School Bag</option>
+                    <option value="shoes">Shoes</option>
+                    <option value="notes">Study Notes</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="description" class="form-label">Description</label>
+                <textarea 
+                    name="description" 
+                    id="description" 
+                    class="form-input" 
+                    rows="4"
+                    placeholder="Describe what you need and why..."
+                    required
+                ></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="urgencyLevel" class="form-label">Priority Level</label>
+                    <select name="urgencyLevel" id="urgencyLevel" class="form-input">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount" class="form-label">Estimated Amount ($)</label>
+                    <input 
+                        type="number" 
+                        name="amount" 
+                        id="amount" 
+                        class="form-input"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                    >
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn secondary" onclick="closeRequestModal()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn primary">
+                    <i class="fas fa-paper-plane"></i>
+                    Submit Request
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Include Socket.io client for real-time updates -->
+<script>
+// Dashboard JavaScript functionality
+let socket;
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSocket();
+    setupEventListeners();
+});
+
+function initializeSocket() {
+    socket = io();
+    
+    // Join student room for notifications
+    socket.emit('join-room', 'student');
+    
+    // Listen for new donation notifications
+    socket.on('new-donor-offering', function(data) {
+        showNotification('New donation available!', `${data.type}: ${data.description}`, 'success');
+        updateLiveIndicator();
+        // Optionally refresh donations section
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
+    });
+    
+    // Listen for donation claimed notifications
+    socket.on('donation-claimed', function(data) {
+        if (data.studentId === '<%= student.uniqueId %>') {
+            showNotification('Donation claimed!', `You successfully claimed: ${data.description}`, 'success');
+        }
+    });
+}
+
+function setupEventListeners() {
+    // Auto-refresh every 30 seconds
+    setInterval(updateLiveIndicator, 30000);
+}
+
+function openRequestModal() {
+    document.getElementById('requestModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeRequestModal() {
+    document.getElementById('requestModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+    
+    // Clear form
+    document.getElementById('newRequestForm').reset();
+}
+
+function filterRequests(status) {
+    const cards = document.querySelectorAll('.request-card');
+    cards.forEach(card => {
+        if (status === 'all' || card.dataset.status === status) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function filterDonations(type) {
+    const cards = document.querySelectorAll('.donation-card');
+    cards.forEach(card => {
+        if (type === 'all' || card.dataset.type === type) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function claimDonation(donationId) {
+    if (confirm('Are you sure you want to claim this donation? This action cannot be undone.')) {
+        // Show loading state
+        const button = event.target.closest('.claim-btn');
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Claiming...';
+        button.disabled = true;
+        
+        // Submit claim
+        fetch(`/student/claim-donation/${donationId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                showNotification('Success!', 'Donation claimed successfully!', 'success');
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            } else {
+                throw new Error('Failed to claim donation');
+            }
+        })
+        .catch(error => {
+            showNotification('Error', 'Failed to claim donation. Please try again.', 'error');
+            button.innerHTML = '<i class="fas fa-hand-paper"></i> Claim This Donation';
+            button.disabled = false;
+        });
+    }
+}
+
+function refreshDashboard() {
+    const button = event.target;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+function updateLiveIndicator() {
+    const indicator = document.getElementById('liveIndicator');
+    indicator.style.animation = 'pulse 1s ease-in-out';
+    
+    setTimeout(() => {
+        indicator.style.animation = '';
+    }, 1000);
+}
+
+function showNotification(title, message, type) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <div class="notification-icon">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            </div>
+            <div class="notification-text">
+                <h4>${title}</h4>
+                <p>${message}</p>
+            </div>
+            <button class="notification-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    // Add to page
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+// Helper functions for EJS
+function getTypeIcon(type) {
+    const icons = {
+        laptop: 'laptop',
+        books: 'book',
+        fees: 'dollar-sign',
+        bag: 'shopping-bag',
+        shoes: 'shoe-prints',
+        notes: 'sticky-note',
+        other: 'gift'
+    };
+    return icons[type] || 'gift';
+}
+
+function getTimeAgo(date) {
+    const now = new Date();
+    const past = new Date(date);
+    const diffTime = Math.abs(now - past);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) return '1 day ago';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
+    return `${Math.ceil(diffDays / 30)} months ago`;
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('requestModal');
+    if (e.target === modal) {
+        closeRequestModal();
+    }
+});
+
+// Handle form submission with loading state
+document.getElementById('newRequestForm').addEventListener('submit', function(e) {
+    const submitBtn = this.querySelector('.btn.primary');
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    submitBtn.disabled = true;
+});
+</script>
+
+<% 
+// Helper functions for EJS (server-side)
+function getTypeIcon(type) {
+    const icons = {
+        laptop: 'laptop',
+        books: 'book',
+        fees: 'dollar-sign',
+        bag: 'shopping-bag',
+        shoes: 'shoe-prints',
+        notes: 'sticky-note',
+        other: 'gift'
+    };
+    return icons[type] || 'gift';
+}
+
+function getTimeAgo(date) {
+    const now = new Date();
+    const past = new Date(date);
+    const diffTime = Math.abs(now - past);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) return '1 day ago';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
+    return `${Math.ceil(diffDays / 30)} months ago`;
+}
+%>

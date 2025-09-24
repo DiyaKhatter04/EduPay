@@ -1,0 +1,713 @@
+
+
+<!-- Register Page -->
+<div class="auth-container">
+    <div class="auth-wrapper">
+        <!-- Back to Home Link -->
+        <div class="back-link">
+            <a href="/" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+        
+        <!-- Registration Form -->
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h1 class="auth-title">Join EduConnect!</h1>
+                <p class="auth-subtitle">Create your account and start making a difference</p>
+            </div>
+            
+            <!-- Role Selection -->
+            <div class="role-selection" id="roleSelection">
+                <h3>I want to join as:</h3>
+                <div class="role-options">
+                    <div class="role-option" data-role="student">
+                        <div class="role-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h4>Student</h4>
+                        <p>Get help with educational needs</p>
+                        <div class="role-features">
+                            <span><i class="fas fa-check"></i> Request supplies</span>
+                            <span><i class="fas fa-check"></i> Get financial aid</span>
+                            <span><i class="fas fa-check"></i> Connect with donors</span>
+                        </div>
+                    </div>
+                    
+                    <div class="role-option" data-role="donor">
+                        <div class="role-icon">
+                            <i class="fas fa-hand-holding-heart"></i>
+                        </div>
+                        <h4>Donor</h4>
+                        <p>Help students achieve their dreams</p>
+                        <div class="role-features">
+                            <span><i class="fas fa-check"></i> Make donations</span>
+                            <span><i class="fas fa-check"></i> Support education</span>
+                            <span><i class="fas fa-check"></i> Track impact</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <form class="auth-form" action="/auth/register" method="POST" id="registerForm" style="display: none;">
+                <input type="hidden" name="role" id="selectedRole">
+                
+                <!-- Basic Information -->
+                <div class="form-section">
+                    <h4 class="section-title">Account Information</h4>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user"></i>
+                                Username
+                            </label>
+                            <input 
+                                type="text" 
+                                id="username" 
+                                name="username" 
+                                class="form-input"
+                                placeholder="Choose a unique username"
+                                required
+                                minlength="3"
+                                maxlength="20"
+                            >
+                            <small class="form-help">3-20 characters, letters and numbers only</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope"></i>
+                                Email Address
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="form-input"
+                                placeholder="your.email@example.com"
+                                required
+                            >
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock"></i>
+                                Password
+                            </label>
+                            <div class="password-input-container">
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="password" 
+                                    class="form-input"
+                                    placeholder="Create a strong password"
+                                    required
+                                    minlength="6"
+                                >
+                                <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                    <i class="fas fa-eye" id="password-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength" id="passwordStrength">
+                                <div class="strength-bar"></div>
+                                <span class="strength-text">Password strength</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label">
+                                <i class="fas fa-lock"></i>
+                                Confirm Password
+                            </label>
+                            <div class="password-input-container">
+                                <input 
+                                    type="password" 
+                                    id="confirmPassword" 
+                                    name="confirmPassword" 
+                                    class="form-input"
+                                    placeholder="Confirm your password"
+                                    required
+                                >
+                                <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                                    <i class="fas fa-eye" id="confirmPassword-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-match" id="passwordMatch"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Role-specific fields -->
+                <div class="form-section" id="roleSpecificFields">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                
+                <!-- Terms and Agreement -->
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" name="terms" id="terms" required>
+                        <span class="checkbox-checkmark"></span>
+                        I agree to the <a href="/terms" target="_blank">Terms of Service</a> and 
+                        <a href="/privacy" target="_blank">Privacy Policy</a>
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" name="newsletter" id="newsletter">
+                        <span class="checkbox-checkmark"></span>
+                        Subscribe to newsletter for updates and success stories
+                    </label>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="button" class="back-btn" onclick="showRoleSelection()">
+                        <i class="fas fa-arrow-left"></i>
+                        Back
+                    </button>
+                    <button type="submit" class="auth-submit-btn" id="registerSubmit">
+                        <span class="btn-text">Create Account</span>
+                        <span class="btn-loader">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </span>
+                    </button>
+                </div>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Already have an account? 
+                    <a href="/auth/login" class="auth-link">Sign in here</a>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Animated Background -->
+        <div class="auth-bg-animation">
+            <div class="floating-shape"></div>
+            <div class="floating-shape"></div>
+            <div class="floating-shape"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Registration form functionality
+let selectedRole = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Role selection handling
+    const roleOptions = document.querySelectorAll('.role-option');
+    roleOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            const role = this.dataset.role;
+            selectRole(role);
+        });
+    });
+    
+    // Form validation
+    const form = document.getElementById('registerForm');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    
+    passwordInput.addEventListener('input', checkPasswordStrength);
+    confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+    
+    form.addEventListener('submit', handleFormSubmit);
+});
+
+function selectRole(role) {
+    selectedRole = role;
+    
+    // Update UI
+    document.querySelectorAll('.role-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    
+    document.querySelector(`[data-role="${role}"]`).classList.add('selected');
+    
+    // Show form after animation
+    setTimeout(() => {
+        document.getElementById('roleSelection').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
+        document.getElementById('selectedRole').value = role;
+        
+        // Load role-specific fields
+        loadRoleSpecificFields(role);
+        
+        // Update form title
+        const title = role === 'student' ? 'Student Registration' : 'Donor Registration';
+        document.querySelector('.auth-title').textContent = title;
+    }, 300);
+}
+
+function loadRoleSpecificFields(role) {
+    const container = document.getElementById('roleSpecificFields');
+    
+    if (role === 'student') {
+        container.innerHTML = `
+            <h4 class="section-title">Student Information</h4>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fullName" class="form-label">
+                        <i class="fas fa-id-card"></i>
+                        Full Name
+                    </label>
+                    <input 
+                        type="text" 
+                        id="fullName" 
+                        name="fullName" 
+                        class="form-input"
+                        placeholder="Your full name"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="school" class="form-label">
+                        <i class="fas fa-school"></i>
+                        School/Institution
+                    </label>
+                    <input 
+                        type="text" 
+                        id="school" 
+                        name="school" 
+                        class="form-input"
+                        placeholder="Your school or college"
+                        required
+                    >
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="grade" class="form-label">
+                    <i class="fas fa-graduation-cap"></i>
+                    Grade/Year
+                </label>
+                <input 
+                    type="text" 
+                    id="grade" 
+                    name="grade" 
+                    class="form-input"
+                    placeholder="e.g., Grade 10, Year 2, Sophomore"
+                    required
+                >
+            </div>
+        `;
+    } else if (role === 'donor') {
+        container.innerHTML = `
+            <h4 class="section-title">Donor Information</h4>
+            
+            <div class="form-group">
+                <label for="fullName" class="form-label">
+                    <i class="fas fa-id-card"></i>
+                    Full Name
+                </label>
+                <input 
+                    type="text" 
+                    id="fullName" 
+                    name="fullName" 
+                    class="form-input"
+                    placeholder="Your full name"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="motivation" class="form-label">
+                    <i class="fas fa-heart"></i>
+                    What motivates you to help students? (Optional)
+                </label>
+                <textarea 
+                    id="motivation" 
+                    name="motivation" 
+                    class="form-input"
+                    placeholder="Share your story or motivation to help others..."
+                    rows="3"
+                ></textarea>
+            </div>
+        `;
+    }
+}
+
+function showRoleSelection() {
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('roleSelection').style.display = 'block';
+    document.querySelector('.auth-title').textContent = 'Join EduConnect!';
+    
+    // Clear selection
+    document.querySelectorAll('.role-option').forEach(opt => {
+        opt.classList.remove('selected');
+    });
+    selectedRole = null;
+}
+
+function checkPasswordStrength() {
+    const password = document.getElementById('password').value;
+    const strengthBar = document.querySelector('.strength-bar');
+    const strengthText = document.querySelector('.strength-text');
+    
+    let strength = 0;
+    let text = '';
+    let color = '';
+    
+    if (password.length >= 6) strength += 1;
+    if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength += 1;
+    if (password.match(/[0-9]/)) strength += 1;
+    if (password.match(/[^a-zA-Z0-9]/)) strength += 1;
+    
+    switch (strength) {
+        case 0:
+        case 1:
+            text = 'Weak';
+            color = '#e74c3c';
+            break;
+        case 2:
+            text = 'Fair';
+            color = '#f39c12';
+            break;
+        case 3:
+            text = 'Good';
+            color = '#f1c40f';
+            break;
+        case 4:
+            text = 'Strong';
+            color = '#27ae60';
+            break;
+    }
+    
+    strengthBar.style.width = (strength * 25) + '%';
+    strengthBar.style.backgroundColor = color;
+    strengthText.textContent = text;
+}
+
+function checkPasswordMatch() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const matchDiv = document.getElementById('passwordMatch');
+    
+    if (confirmPassword.length > 0) {
+        if (password === confirmPassword) {
+            matchDiv.innerHTML = '<i class="fas fa-check"></i> Passwords match';
+            matchDiv.className = 'password-match success';
+        } else {
+            matchDiv.innerHTML = '<i class="fas fa-times"></i> Passwords do not match';
+            matchDiv.className = 'password-match error';
+        }
+    } else {
+        matchDiv.innerHTML = '';
+        matchDiv.className = 'password-match';
+    }
+}
+
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const eye = document.getElementById(fieldId + '-eye');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        eye.className = 'fas fa-eye-slash';
+    } else {
+        field.type = 'password';
+        eye.className = 'fas fa-eye';
+    }
+}
+
+function handleFormSubmit(e) {
+    const submitBtn = document.getElementById('registerSubmit');
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const terms = document.getElementById('terms').checked;
+    
+    // Show loading state
+    submitBtn.classList.add('loading');
+    
+    // Validation
+    if (!selectedRole) {
+        e.preventDefault();
+        showAlert('Please select a role', 'error');
+        submitBtn.classList.remove('loading');
+        return;
+    }
+    
+    if (password !== confirmPassword) {
+        e.preventDefault();
+        showAlert('Passwords do not match', 'error');
+        submitBtn.classList.remove('loading');
+        return;
+    }
+    
+    if (!terms) {
+        e.preventDefault();
+        showAlert('Please accept the terms and conditions', 'error');
+        submitBtn.classList.remove('loading');
+        return;
+    }
+    
+    // If validation passes, form will submit naturally
+}
+
+function showAlert(message, type) {
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.innerHTML = `
+        <div class="alert-content">
+            <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.insertBefore(alert, document.body.firstChild);
+    
+    setTimeout(() => {
+        alert.remove();
+    }, 3000);
+}
+</script>
+
+<style>
+/* Extend auth styles with registration-specific styles */
+.role-selection {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.role-selection h3 {
+    font-size: 1.25rem;
+    color: #2d3436;
+    margin-bottom: 2rem;
+    font-weight: 600;
+}
+
+.role-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.role-option {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    padding: 2rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.role-option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    transition: left 0.3s ease;
+}
+
+.role-option:hover::before,
+.role-option.selected::before {
+    left: 0;
+}
+
+.role-option:hover,
+.role-option.selected {
+    border-color: #667eea;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+}
+
+.role-option.selected {
+    border-color: #00b894;
+    background: linear-gradient(135deg, rgba(0, 184, 148, 0.05), rgba(0, 160, 133, 0.05));
+}
+
+.role-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: white;
+    font-size: 1.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.role-option h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3436;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.role-option p {
+    color: #636e72;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.role-features {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.role-features span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #636e72;
+}
+
+.role-features i {
+    color: #00b894;
+    font-size: 0.8rem;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3436;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 2px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.form-help {
+    font-size: 0.8rem;
+    color: #636e72;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.password-strength {
+    margin-top: 0.5rem;
+}
+
+.strength-bar {
+    height: 4px;
+    background: #e9ecef;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    margin-bottom: 0.25rem;
+}
+
+.strength-text {
+    font-size: 0.8rem;
+    color: #636e72;
+}
+
+.password-match {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.password-match.success {
+    color: #00b894;
+}
+
+.password-match.error {
+    color: #e74c3c;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.back-btn {
+    flex: 1;
+    padding: 1rem;
+    background: #f8f9fa;
+    color: #636e72;
+    border: 1px solid #e9ecef;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.back-btn:hover {
+    background: #e9ecef;
+    color: #2d3436;
+}
+
+.auth-submit-btn {
+    flex: 2;
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 60px;
+    font-family: inherit;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .role-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-buttons {
+        flex-direction: column;
+    }
+    
+    .auth-submit-btn {
+        flex: 1;
+    }
+}
+</style>

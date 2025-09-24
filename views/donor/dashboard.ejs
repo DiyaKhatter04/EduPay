@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg border-b-2 border-blue-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <i class="fas fa-hand-holding-heart text-blue-600 text-2xl mr-3"></i>
+                    <h1 class="text-xl font-bold text-gray-800">EduConnect Donor</h1>
+                </div>
+                
+                <div class="flex items-center space-x-6">
+                    <a href="/donor/dashboard" class="text-blue-600 font-medium border-b-2 border-blue-600 pb-1">
+                        <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+                    </a>
+                    <a href="/donor/scholarships" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-award mr-2"></i>My Scholarships
+                    </a>
+                    <a href="/donor/create-scholarship" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Create Scholarship
+                    </a>
+                    
+                    <div class="flex items-center text-gray-700">
+                        <i class="fas fa-user-circle text-2xl mr-2"></i>
+                        <span class="font-medium"><%= user.name %></span>
+                    </div>
+                    
+                    <a href="/auth/logout" class="text-red-600 hover:text-red-800">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8 fade-in">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Welcome back, <%= user.name %>!</h2>
+            <p class="text-gray-600">Track your scholarship impact and help students achieve their dreams.</p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover fade-in">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100">
+                        <i class="fas fa-award text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Scholarships</p>
+                        <p class="text-2xl font-bold text-gray-900"><%= stats.totalScholarships %></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover fade-in">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100">
+                        <i class="fas fa-dollar-sign text-green-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Funded</p>
+                        <p class="text-2xl font-bold text-gray-900">$<%= stats.totalFunded.toLocaleString() %></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover fade-in">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100">
+                        <i class="fas fa-clock text-purple-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Active Scholarships</p>
+                        <p class="text-2xl font-bold text-gray-900"><%= stats.activeScholarships %></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 card-hover fade-in">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-orange-100">
+                        <i class="fas fa-users text-orange-600 text-xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Students Helped</p>
+                        <p class="text-2xl font-bold text-gray-900"><%= stats.studentsHelped %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="lg:col-span-1">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-lg p-6 text-white fade-in">
+                    <h3 class="text-xl font-semibold mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <a href="/donor/create-scholarship" class="flex items-center p-3 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-colors">
+                            <i class="fas fa-plus text-white mr-3"></i>
+                            <span>Create New Scholarship</span>
+                        </a>
+                        <a href="/donor/scholarships" class="flex items-center p-3 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-colors">
+                            <i class="fas fa-list text-white mr-3"></i>
+                            <span>Manage Scholarships</span>
+                        </a>
+                        <a href="/donor/applications" class="flex items-center p-3 bg-white bg-opacity-20 rounded-lg hover:bg-opacity-30 transition-colors">
+                            <i class="fas fa-file-alt text-white mr-3"></i>
+                            <span>Review Applications</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-md p-6 fade-in">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Impact Overview</h3>
+                    <div class="h-64">
+                        <canvas id="impactChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Scholarships & Recent Applications -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- My Recent Scholarships -->
+            <div class="bg-white rounded-xl shadow-md p-6 fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800">My Recent Scholarships</h3>
+                    <a href="/donor/scholarships" class="text-blue-600 hover:text-blue-800 font-medium">
+                        View All <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                
+                <div class="space-y-4">
+                    <% if (myScholarships.length > 0) { %>
+                        <% myScholarships.forEach(scholarship => { %>
+                        <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-gray-900"><%= scholarship.title %></h4>
+                                    <p class="text-sm text-gray-600 mt-1"><%= scholarship.description.substring(0, 100) %>...</p>
+                                    <div class="flex items-center mt-2 space-x-4">
+                                        <span class="text-sm font-medium text-green-600">$<%= scholarship.amount.toLocaleString() %></span>
+                                        <span class="text-xs text-gray-500">Due: <%= scholarship.deadline.toLocaleDateString() %></span>
+                                    </div>
+                                </div>
+                                <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                    <%= scholarship.status === 'active' ? 'bg-green-100 text-green-800' : 
+                                        scholarship.status === 'inactive' ? 'bg-gray-100 text-gray-800' : 
+                                        'bg-blue-100 text-blue-800' %>">
+                                    <%= scholarship.status.charAt(0).toUpperCase() + scholarship.status.slice(1) %>
+                                </span>
+                            </div>
+                        </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="text-center py-8">
+                            <i class="fas fa-award text-gray-300 text-4xl mb-4"></i>
+                            <p class="text-gray-500">No scholarships created yet.</p>
+                            <a href="/donor/create-scholarship" class="inline-block mt-2 text-blue-600 hover:text-blue-800">
+                                Create your first scholarship
+                            </a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Recent Applications -->
+            <div class="bg-white rounded-xl shadow-md p-6 fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800">Recent Applications</h3>
+                    <a href="/donor/applications" class="text-blue-600 hover:text-blue-800 font-medium">
+                        View All <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                
+                <div class="space-y-4">
+                    <% if (recentApplications.length > 0) { %>
+                        <% recentApplications.slice(0, 5).forEach(app => { %>
+                        <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-gray-900"><%= app.studentId.name %></h4>
+                                    <p class="text-sm text-gray-600"><%= app.scholarshipId.title %></p>
+                                    <p class="text-xs text-gray-500 mt-1">Applied <%= app.createdAt.toLocaleDateString() %></p>
+                                </div>
+                                <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                    <%= app.status === 'pending' ? 'bg-orange-100 text-orange-800' : 
+                                        app.status === 'approved' ? 'bg-green-100 text-green-800' : 
+                                        'bg-red-100 text-red-800' %>">
+                                    <%= app.status.charAt(0).toUpperCase() + app.status.slice(1) %>
+                                </span>
+                            </div>
+                        </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="text-center py-8">
+                            <i class="fas fa-file-alt text-gray-300 text-4xl mb-4"></i>
+                            <p class="text-gray-500">No applications received yet.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    data: [<%= stats.totalFunded %>, <%= stats.activeScholarships %>, <%= stats.studentsHelped %>],
+                backgroundColor: [
+                    'rgba(59, 130, 246, 0.8)',
+                    'rgba(16, 185, 129, 0.8)',
+                    'rgba(249, 115, 22, 0.8)'
+                ],
+                borderColor: [
+                    'rgb(59, 130, 246)',
+                    'rgb(16, 185, 129)',
+                    'rgb(249, 115, 22)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

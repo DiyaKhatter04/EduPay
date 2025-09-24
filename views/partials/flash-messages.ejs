@@ -1,0 +1,13 @@
+<% if (typeof success !== 'undefined' && success) { %>
+    <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+        <strong>Success:</strong> <%= success %>
+        <button style="float: right;" onclick="this.parentElement.style.display='none';">x</button>
+    </div>
+<% } %>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+        <strong>Error:</strong> <%= error %>
+        <button style="float: right;" onclick="this.parentElement.style.display='none';">x</button>
+    </div>
+<% } %>

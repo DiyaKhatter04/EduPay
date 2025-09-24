@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'EduConnect - Smart Micro-Scholarship Platform' %></title>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Socket.io Client -->
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <!-- Chart.js for Admin Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Include Navigation if user is logged in -->
+    <% if (typeof user !== 'undefined' && user) { %>
+        <%- include('../partials/navbar') %>
+    <% } %>
+    
+    <!-- Flash Messages -->
+    <%- include('../partials/flash-messages') %>  <!-- Fixed filename to match the actual file -->
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <%- body %>
+    </main>
+    
+    <!-- Footer -->
+    <%- include('../partials/footer') %>
+    
+    <!-- Notification Container for Real-time Updates -->
+    <div id="notification-container"></div>
+    
+    <!-- Scripts -->
+    <script src="/js/main.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/socket-client.js"></script>
+    
+    <!-- Page-specific scripts -->
+    <% if (typeof scripts !== 'undefined') { %>
+        <% scripts.forEach(function(script) { %>
+            <script src="<%= script %>"></script>
+        <% }); %>
+    <% } %>
+</body>
+</html>
